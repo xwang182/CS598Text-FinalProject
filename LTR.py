@@ -3,6 +3,7 @@ import random
 import sys
 import time
 import matplotlib.pyplot as plt
+import operator
 
 def readData(data,path):
     with open(path) as f:
@@ -225,14 +226,13 @@ def drawGraph():
     testPath = "./test.txt"
     readData(testData,testPath)
 
-
-    number_lst = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
-    # number_lst = [1,5,10,20,30,40,50,60,70,80,90,100]
+    # number_lst = [1,2,3,4,5,6,7,8,9,10,20,30,40,50,60,70,80,90,100]
+    number_lst = [1,5,10,30,50,70,100]
+    # number_lst = [1,3]
     sampling = "index"
     time_lst = []
     acc_lst = []
     for number in number_lst:
-        print number
         number = int(number * 0.01 * pairLen)
 
         avg_time = 0.0
@@ -246,8 +246,9 @@ def drawGraph():
             avg_time = avg_time + timeUsed
             accuracy = test(testData,trainW)
             avg_acc = avg_acc + accuracy
-        time_save = avg_time / 3.0
-        acc = avg_acc / 3.0
+        
+        time_save = avg_time / 10.0
+        acc = avg_acc / 10.0
         time_lst.append(time_save)
         acc_lst.append(acc)
 
@@ -256,10 +257,7 @@ def drawGraph():
     print time_lst
     print acc_lst
     fig = plt.figure(1)
-    if sampling == "index":
-        plt.title('Index Sampling percentage against time')
-    else:
-        plt.title('Unindex Sampling percentage against time')
+    plt.title('Index Sampling percentage against time')
     plt.xlabel('Sampling Percentage')
     plt.ylabel('Time')
     plt.plot(number_lst, time_lst,linewidth=3,linestyle='solid')
@@ -275,69 +273,97 @@ def drawGraph():
 
 
 
-drawGraph()
+def testFourAcc():
+    trainW = [1.0, 0.0, 0.0, 0.0, 0.0]
+    testData = dict()
+    testPath = "./test.txt"
+    readData(testData,testPath)
+    accuracy = test(testData,trainW)
+    print "BM25 accuracy : " + str(accuracy)
 
+    trainW = [0.0, 1.0, 0.0, 0.0, 0.0]
+    testData = dict()
+    testPath = "./test.txt"
+    readData(testData,testPath)
+    accuracy = test(testData,trainW)
+    print "ABS accuracy : " + str(accuracy)
 
-# train = dict()
-# trainPath = "./train.txt"
-# docNum = readData(train,trainPath)
+    trainW = [0.0, 0.0, 1.0, 0.0, 0.0]
+    testData = dict()
+    testPath = "./test.txt"
+    readData(testData,testPath)
+    accuracy = test(testData,trainW)
+    print "DIR accuracy : " + str(accuracy)
 
-# pairLen = approximate(train,docNum)
-
-# sampling = "all"  "unindex" "index"
-# sampling = "index"
-# sampling = raw_input('Choose sampling method from index sampling, unindex sampling, no sampling\nPlease type "index" or "unindex" or "no": ')
-# if sampling != "no":
-#     number = raw_input('How many sampling pairs do you want 0-100%\nPlease type a integer 1-100: ')
-#     number = int(int(number) * 0.01 * pairLen)
-
-# trainW = weightInit()
-# startTime = time.time()
-# trainW = learn(train,trainW,sampling,number)
-# endTime = time.time()
-# print "Weight vector:"
-# print trainW
-# print sampling + "sampling Training Time:   " + str(endTime-startTime)
-
-# testData = dict()
-# testPath = "./test.txt"
-# readData(testData,testPath)
-# accuracy = test(testData,trainW)
-# print "accuracy : " + str(accuracy)
-
-
-
-
-
-# trainW = [1.0, 0.0, 0.0, 0.0, 0.0]
-# testData = dict()
-# testPath = "./test.txt"
-# readData(testData,testPath)
-# accuracy = test(testData,trainW)
-# print "BM25 accuracy : " + str(accuracy)
-
-# trainW = [0.0, 1.0, 0.0, 0.0, 0.0]
-# testData = dict()
-# testPath = "./test.txt"
-# readData(testData,testPath)
-# accuracy = test(testData,trainW)
-# print "ABS accuracy : " + str(accuracy)
-
-# trainW = [0.0, 0.0, 1.0, 0.0, 0.0]
-# testData = dict()
-# testPath = "./test.txt"
-# readData(testData,testPath)
-# accuracy = test(testData,trainW)
-# print "DIR accuracy : " + str(accuracy)
-
-# trainW = [0.0, 0.0, 0.0, 1.0, 0.0]
-# testData = dict()
-# testPath = "./test.txt"
-# readData(testData,testPath)
-# accuracy = test(testData,trainW)
-# print "JM accuracy : " + str(accuracy)
+    trainW = [0.0, 0.0, 0.0, 1.0, 0.0]
+    testData = dict()
+    testPath = "./test.txt"
+    readData(testData,testPath)
+    accuracy = test(testData,trainW)
+    print "JM accuracy : " + str(accuracy)
 
 
 
 
+
+
+def getSamplingCom(train,docNum):
+    pairLen = approximate(train,docNum)
+    number = 0
+    method = raw_input("How many ranking functions do you have: ")
+    sampling = raw_input('Choose sampling method from index sampling, unindex sampling, no sampling\nPlease type "index" or "unindex" or "no": ')
+    if sampling != "no":
+        number = raw_input('How many sampling pairs do you want 1-100%\nPlease type a integer 1-100: ')
+        number = int(int(number) * 0.01 * pairLen)
+    return (sampling,number)
+
+
+def testLTR(trainW):
+    testData = dict()
+    testPath = "./test.txt"
+    readData(testData,testPath)
+    accuracy = test(testData,trainW)
+    print "LTR accuracy : " + str(accuracy)
+
+def showlist(trainW):
+    testData = dict()
+    testPath = "./test.txt"
+    readData(testData,testPath)
+    for query in testData.keys()[0:5]:
+        print "Query ID: " + str(query)
+        print "Rank              Document ID              Score"
+        alldoc = testData[query][0:10]
+        docDict = dict()
+        for i in range(0,10):
+            docArr = alldoc[i][1:5]
+            docArr.append(-1.0)
+            docDict[i] = oneDoc(trainW,docArr)
+        sorted_doc = sorted(docDict.items(), key=operator.itemgetter(1),reverse=True)
+        for i in range(0,10):
+            print str(i) + "                  " + str(sorted_doc[i][0]) + "                  " + str(sorted_doc[i][1])
+
+# drawGraph()
+
+
+train = dict()
+trainPath = "./train.txt"
+docNum = readData(train,trainPath)
+
+(sampling,number) = getSamplingCom(train,docNum)
+trainW = weightInit()
+
+startTime = time.time()
+trainW = learn(train,trainW,sampling,number)
+endTime = time.time()
+
+print "Weight vector:"
+print trainW
+print sampling + "sampling Training Time:   " + str(endTime-startTime)
+
+
+testLTR(trainW)
+
+showlist(trainW)
+
+# testFourAcc()
 
