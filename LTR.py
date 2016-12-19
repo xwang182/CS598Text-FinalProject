@@ -5,18 +5,22 @@ import time
 import matplotlib.pyplot as plt
 import operator
 
+#read input from path
 def readData(data,path):
     with open(path) as f:
         content = f.readlines()
     docNum = len(content)
+    
+    #extract and store info
     for line in content:
         arr = line.split()
-
+        
         doc = []
         relevance = int(arr[0])
         query = int(arr[1].split(":")[1])
         doc.append(query)
-
+        
+        #users can edit index to change ranking functions.
         doc.append(float(arr[111].split(":")[1]))
         doc.append(float(arr[116].split(":")[1]))
         doc.append(float(arr[121].split(":")[1]))
@@ -31,6 +35,7 @@ def readData(data,path):
             data[query].append(doc)
     return docNum
 
+# super-linear dependencies sampling
 def allSampling(train):
     output = []
     for qid in train.keys():
@@ -82,7 +87,7 @@ def weightInit():
     weight = [init,init,init,init,init]
     return weight 
 
-
+#random sampling; space more efficient 
 def UnindexSampling(train,number):
     pairs = []
     trainSample = dict()
@@ -117,7 +122,7 @@ def UnindexSampling(train,number):
         pairs.append(pair)
     return pairs
 
-
+#random sampling; time more efficient 
 def IndexSampling(train,number):
     pairs = []
     trainSample = dict()
@@ -301,8 +306,6 @@ def testFourAcc():
     readData(testData,testPath)
     accuracy = test(testData,trainW)
     print "JM accuracy : " + str(accuracy)
-
-
 
 
 
