@@ -160,6 +160,7 @@ def IndexSampling(train,number):
         pairs.append(pair)
     return pairs
 
+#training
 def learn(train,weight,sampling,number):
     rate = 1.0
     if sampling == "no":
@@ -185,7 +186,7 @@ def learn(train,weight,sampling,number):
             update_weight(weight,rele,compareArr,rate)
     return weight
 
-
+#testing
 def test(testData,trainW):
     correct = 0.0
     total = 0.0
@@ -219,6 +220,7 @@ def approximate(train,docNum):
     oneLevel = int(oneKey / 5)
     pairsNum = 10 * oneLevel * oneLevel * keyNum
     return pairsNum
+
 
 
 def drawGraph():
@@ -276,8 +278,7 @@ def drawGraph():
     plt.show()
 
 
-
-
+#compare learning to rank ranking function with leveraged ranking functions
 def testFourAcc():
     trainW = [1.0, 0.0, 0.0, 0.0, 0.0]
     testData = dict()
@@ -308,8 +309,7 @@ def testFourAcc():
     print "JM accuracy : " + str(accuracy)
 
 
-
-
+#User Interface
 def getSamplingCom(train,docNum):
     pairLen = approximate(train,docNum)
     number = 0
